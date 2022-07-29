@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NoteContainer from './components/Notes/NoteContainer';
 import SideBar from './components/SideBar/SideBar';
 
@@ -11,7 +11,7 @@ const DUMMY_NOTES = [
   },
   {
     id: 'n2',
-    text: 'You can edit your note by clicking the pencil icon',
+    text: 'You can lock your note by clicking the lock icon and unlock with the same',
     time: 'Jul 25, 8:00 PM',
     color: '#C4DFAA'
   },
@@ -25,7 +25,9 @@ const DUMMY_NOTES = [
 
 const App = () => {
 
-  const [notes, setNotes] = useState(DUMMY_NOTES);
+  const [notes, setNotes] = useState(
+    JSON.parse(localStorage.getItem('react-notes-app')) || DUMMY_NOTES
+  );
 
   const addNoteHandler = (themeColor) => {
       const note = {
@@ -40,20 +42,37 @@ const App = () => {
   }
 
   const deleteNoteHandler = (noteId) => {
-     const prevNotes = [...notes];
-     let indexToDelete = -1;
-     for(let i=0; i<prevNotes.length; i++){
-      if( prevNotes[i]['id'] == noteId ) indexToDelete=i;
-     }
-     if(indexToDelete < 0) return;
-     else prevNotes.splice(indexToDelete, 1);
-     setNotes(prevNotes);
+    const prevNotes = [...notes];
+    
+    let indexToDelete = prevNotes.findIndex( (note)=> note.id === noteId );
+    if(indexToDelete < 0) return;
+
+    prevNotes.splice(indexToDelete, 1);
+    setNotes(prevNotes);
   }
+  
+  const updateTextHandler = (noteId, textValue) => {
+    const prevNotes = [...notes];
+    
+    let indexToUpdate = prevNotes.findIndex( (note)=> note.id === noteId );
+    if(indexToUpdate < 0) return;
+
+    prevNotes[indexToUpdate].text = textValue;
+    setNotes(prevNotes);
+  }
+  
+  // IMPLEMENTING LOCAL STORAGE
+  useEffect(() => {
+    localStorage.setItem('react-notes-app', JSON.stringify(notes));
+  }, [notes])
   
   return(
     <div className='app'>
       <SideBar addTheme ={ addNoteHandler } />
-      <NoteContainer notes={notes} deleteNote = { deleteNoteHandler } />
+      <NoteContainer 
+          notes={notes} 
+          deleteNote = { deleteNoteHandler }
+          updateText = { updateTextHandler } />
     </div>
   );
   
