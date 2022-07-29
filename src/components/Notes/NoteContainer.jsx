@@ -14,7 +14,8 @@ const NoteContainer = (props) => {
                         key= {noteObj.id}
                         note = {noteObj}
                         deleteNote = { (noteId)=> props.deleteNote(noteId) }
-                        updateText = { (id, value)=> props.updateText(id, value) }
+                        updateText = { (noteId, value)=> props.updateText(noteId, value) }
+                        updateLock = { (noteId, lock)=> props.updateLock(noteId, lock) }
                     />
                 )
             }
